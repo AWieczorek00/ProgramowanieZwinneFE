@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from 'react-router-dom';
 import { AppBar, Toolbar, Typography, Button, Box } from "@mui/material";
 
 function Navbar() {
@@ -6,7 +7,9 @@ function Navbar() {
     <AppBar position="static" color="primary">
       <Toolbar>
         <Typography variant="h6" sx={{ flexGrow: 1 }}>
-          Project manager
+          <Link to="/" style={{ textDecoration: 'none', color: 'inherit' }}>
+            Project manager
+          </Link>
         </Typography>
 
         <Box>

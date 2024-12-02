@@ -1,5 +1,5 @@
-import React, { useState, useRef, useEffect, useDebugValue } from 'react';
-import { Box, TextField, Button, List, ListItem, ListItemText, Typography, IconButton } from '@mui/material';
+import React, { useState, useRef, useEffect} from 'react';
+import { Box, TextField, Button, List, ListItem, ListItemText, IconButton } from '@mui/material';
 import ChatIcon from '@mui/icons-material/Chat';
 import SockJS from 'sockjs-client';
 import { Client } from '@stomp/stompjs';

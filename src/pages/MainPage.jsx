@@ -1,37 +1,20 @@
 import React, { useState } from "react";
 import {
   Box,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
   Typography,
-  useTheme,
   Button,
   TextField,
-  Link as MuiLink,
-  TableSortLabel,
-  Select,
-  MenuItem,
+  useTheme,
 } from "@mui/material";
+import { DataGrid } from "@mui/x-data-grid";
 import { Link } from "react-router-dom";
 
 export default function MainPage() {
   const theme = useTheme();
 
   const [searchQuery, setSearchQuery] = useState("");
-  const [order, setOrder] = useState("asc");
-  const [orderBy, setOrderBy] = useState("no");
-  const [currentPage, setCurrentPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
 
   const styles = {
-    tableCell: { border: "1px solid #ddd" },
-    headerCell: { color: theme.palette.primary.contrastText, border: "1px solid #ddd" },
-    tableHeaderRow: { backgroundColor: theme.palette.primary.main },
     container: {
       display: "flex",
       justifyContent: "center",
@@ -59,47 +42,20 @@ export default function MainPage() {
         backgroundColor: theme.palette.primary.dark,
       },
     },
-    searchContainer: {
+    controlsContainer: {
       display: "flex",
       justifyContent: "space-between",
       alignItems: "center",
       marginBottom: theme.spacing(2),
     },
-    paginationContainer: {
-      display: "flex",
-      alignItems: "center",
-      gap: theme.spacing(2),
-    },
-    searchLabel: {
-      fontSize: "0.875rem",
-      marginRight: theme.spacing(1),
-    },
-    searchTextField: {
-      width: "200px",
-      height: "30px",
-      "& .MuiInputBase-root": {
-        height: "30px",
-        fontSize: "0.75rem",
-      },
-    },
-    tableContainer: {
-      boxShadow: theme.shadows[3],
-      borderRadius: "5px",
-      maxHeight: "400px", // Set maximum height for scroll
-      overflowY: "auto", // Enable scrolling
-      scrollbarWidth: "none", // Firefox-specific property to hide scrollbar
-    },
-    // Custom CSS to hide scrollbar in webkit-based browsers
-    tableBody: {
-      "::-webkit-scrollbar": {
-        display: "none", // Hides the scrollbar in webkit browsers (Chrome, Safari, Edge)
-      },
+    searchBox: {
+      width: "300px",
     },
   };
 
   // Sample data for projects table
   const exampleProjects = [
-    { no: 1, id: 10, name: "Example project 1", description: "Description 1", creationDate: "2024-11-15", defenseDate: "2025-01-22" },
+    { no: 1, id: 10, name: "Example project 1", description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer mauris lorem, ultrices vitae erat vel, mattis eleifend purus. Nulla sodales urna elit, id bibendum erat viverra ac. In laoreet auctor enim, sed lobortis quam ullamcorper semper.", creationDate: "2024-11-15", defenseDate: "2025-01-22" },
     { no: 2, id: 20, name: "Example project 2", description: "Description 2", creationDate: "2024-11-16", defenseDate: "2025-01-21" },
     { no: 3, id: 30, name: "Example project 3", description: "Description 3", creationDate: "2024-11-17", defenseDate: "2025-02-10" },
     { no: 4, id: 40, name: "Example project 4", description: "Description 4", creationDate: "2024-11-18", defenseDate: "2025-01-23" },
@@ -114,53 +70,48 @@ export default function MainPage() {
     setSearchQuery(event.target.value);
   };
 
-  // Filtered projects based on search query
-  const filteredProjects = exampleProjects.filter((project) =>
-    Object.values(project)
-      .join(" ")
-      .toLowerCase()
-      .includes(searchQuery.toLowerCase())
-  );
-
-  // Sorting function based on column and order
-  const handleRequestSort = (property) => {
-    const isAsc = orderBy === property && order === "asc";
-    setOrder(isAsc ? "desc" : "asc");
-    setOrderBy(property);
-  };
-
-  // Sort projects data
-  const sortedProjects = [...filteredProjects].sort((a, b) => {
-    if (a[orderBy] < b[orderBy]) {
-      return order === "asc" ? -1 : 1;
-    }
-    if (a[orderBy] > b[orderBy]) {
-      return order === "asc" ? 1 : -1;
-    }
-    return 0;
+  // Filtering projects based on search query
+  const filteredProjects = exampleProjects.filter((project) => {
+    const query = searchQuery.toLowerCase();
+    return Object.values(project).some((value) =>
+      value.toString().toLowerCase().includes(query)
+    );
   });
 
-  // Paginate data
-  const paginatedProjects = sortedProjects.slice(
-    currentPage * rowsPerPage,
-    currentPage * rowsPerPage + rowsPerPage
-  );
-
-  // Handle page size change
-  const handleRowsPerPageChange = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setCurrentPage(0);
-  };
-
-  // Handle page navigation - next
-  const handleNextPage = () => {
-    setCurrentPage((prevPage) => prevPage + 1);
-  };
-
-  // Handle page navigation - previous
-  const handlePrevPage = () => {
-    setCurrentPage((prevPage) => Math.max(prevPage - 1, 0));
-  };
+  // DataGrid columns
+  const columns = [
+    { field: "no", headerName: "No", width: 70 },
+    { field: "id", headerName: "ID", width: 100 },
+    { field: "name", headerName: "Project Name", width: 200 },
+    { field: "description", headerName: "Description", width: 200, flex: 1 },
+    { field: "creationDate", headerName: "Creation Date", width: 150 },
+    { field: "defenseDate", headerName: "Defense Date", width: 150 },
+    {
+      field: "settings",
+      headerName: "Settings",
+      width: 300,
+      flex: 1,
+      renderCell: (params) => (
+        <Box sx={{ display: "flex", gap: theme.spacing(1), alignItems: "center" }}>
+          <Link to={`/editProject/${params.row.id}`} style={styles.link}>
+            Edit
+          </Link>
+          <Box sx={{ width: "1px", height: "1rem", backgroundColor: theme.palette.divider }} />
+          <Link to={`/tasks/${params.row.id}`} style={styles.link}>
+            Tasks
+          </Link>
+          <Box sx={{ width: "1px", height: "1rem", backgroundColor: theme.palette.divider }} />
+          <Link to={`/students/${params.row.id}`} style={styles.link}>
+            Students
+          </Link>
+          <Box sx={{ width: "1px", height: "1rem", backgroundColor: theme.palette.divider }} />
+          <Link to={`/deleteProject/${params.row.id}`} style={styles.link}>
+            Delete
+          </Link>
+        </Box>
+      ),
+    },
+  ];
 
   return (
     <Box sx={styles.container}>
@@ -169,151 +120,35 @@ export default function MainPage() {
           Projects Table
         </Typography>
 
-        <Box sx={styles.searchContainer}>
+        <Box sx={styles.controlsContainer}>
+          {/* Add Project Button */}
           <Button variant="contained" sx={styles.addButton} component={Link} to="/addProject">
             Add Project
           </Button>
-
-          {/* Search text field */}
-          <Box sx={{ display: "flex", alignItems: "center" }}>
-            <Typography sx={styles.searchLabel}>Search</Typography>
-            <TextField variant="outlined" value={searchQuery} onChange={handleSearchChange} sx={styles.searchTextField} />
-          </Box>
-
-          {/* Table pagination */}
-          <Box sx={styles.paginationContainer}>
-            <Button variant="contained" onClick={handlePrevPage} disabled={currentPage === 0}>
-              Previous
-            </Button>
-            <Typography variant="body2">
-              Page {currentPage + 1} of {Math.ceil(sortedProjects.length / rowsPerPage)}
-            </Typography>
-            <Button variant="contained" onClick={handleNextPage} disabled={currentPage + 1 >= Math.ceil(sortedProjects.length / rowsPerPage)}>
-              Next
-            </Button>
-            <Select value={rowsPerPage} onChange={handleRowsPerPageChange} size="small">
-              {[5, 10, 15].map((size) => (
-                <MenuItem key={size} value={size}>
-                  {size} rows
-                </MenuItem>
-              ))}
-            </Select>
-          </Box>
+          
+          {/* Search Box */}
+          <TextField
+            variant="outlined"
+            placeholder="Search projects..."
+            value={searchQuery}
+            onChange={handleSearchChange}
+            size="small"
+            sx={styles.searchBox}
+          />
         </Box>
 
-        {/* Projects table */}
-        <TableContainer component={Paper} sx={styles.tableContainer}>
-          <Table>
-            <TableHead>
-              <TableRow sx={styles.tableHeaderRow}>
-                <TableCell
-                  sx={styles.headerCell}
-                  sortDirection={orderBy === "no" ? order : false}
-                >
-                  <TableSortLabel
-                    active={orderBy === "no"}
-                    direction={orderBy === "no" ? order : "asc"}
-                    onClick={() => handleRequestSort("no")}
-                  >
-                    No
-                  </TableSortLabel>
-                </TableCell>
-                <TableCell
-                  sx={styles.headerCell}
-                  sortDirection={orderBy === "id" ? order : false}
-                >
-                  <TableSortLabel
-                    active={orderBy === "id"}
-                    direction={orderBy === "id" ? order : "asc"}
-                    onClick={() => handleRequestSort("id")}
-                  >
-                    ID
-                  </TableSortLabel>
-                </TableCell>
-                <TableCell
-                  sx={styles.headerCell}
-                  sortDirection={orderBy === "name" ? order : false}
-                >
-                  <TableSortLabel
-                    active={orderBy === "name"}
-                    direction={orderBy === "name" ? order : "asc"}
-                    onClick={() => handleRequestSort("name")}
-                  >
-                    Project Name
-                  </TableSortLabel>
-                </TableCell>
-                <TableCell
-                  sx={styles.headerCell}
-                  sortDirection={orderBy === "description" ? order : false}
-                >
-                  <TableSortLabel
-                    active={orderBy === "description"}
-                    direction={orderBy === "description" ? order : "asc"}
-                    onClick={() => handleRequestSort("description")}
-                  >
-                    Description
-                  </TableSortLabel>
-                </TableCell>
-                <TableCell
-                  sx={styles.headerCell}
-                  sortDirection={orderBy === "creationDate" ? order : false}
-                >
-                  <TableSortLabel
-                    active={orderBy === "creationDate"}
-                    direction={orderBy === "creationDate" ? order : "asc"}
-                    onClick={() => handleRequestSort("creationDate")}
-                  >
-                    Creation Date
-                  </TableSortLabel>
-                </TableCell>
-                <TableCell
-                  sx={styles.headerCell}
-                  sortDirection={orderBy === "defenseDate" ? order : false}
-                >
-                  <TableSortLabel
-                    active={orderBy === "defenseDate"}
-                    direction={orderBy === "defenseDate" ? order : "asc"}
-                    onClick={() => handleRequestSort("defenseDate")}
-                  >
-                    Defense Date
-                  </TableSortLabel>
-                </TableCell>
-                <TableCell sx={styles.headerCell}>Settings</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody sx={styles.tableBody}>
-              {paginatedProjects.map((project) => (
-                <TableRow key={project.id}>
-                  <TableCell sx={styles.tableCell}>{project.no}</TableCell>
-                  <TableCell sx={styles.tableCell}>{project.id}</TableCell>
-                  <TableCell sx={styles.tableCell}>{project.name}</TableCell>
-                  <TableCell sx={styles.tableCell}>{project.description}</TableCell>
-                  <TableCell sx={styles.tableCell}>{project.creationDate}</TableCell>
-                  <TableCell sx={styles.tableCell}>{project.defenseDate}</TableCell>
-                  <TableCell sx={styles.tableCell}>
-                    <Box sx={{ display: "flex", gap: theme.spacing(1), alignItems: "center" }}>
-                      <MuiLink component={Link} to={`/editProject/${project.id}`} sx={styles.link}>
-                        Edit
-                      </MuiLink>
-                      <Box sx={{ width: "1px", height: "1rem", backgroundColor: theme.palette.divider }} />
-                      <MuiLink component={Link} to={`/tasks/${project.id}`} sx={styles.link}>
-                        Tasks
-                      </MuiLink>
-                      <Box sx={{ width: "1px", height: "1rem", backgroundColor: theme.palette.divider }} />
-                      <MuiLink component={Link} to={`/students/${project.id}`} sx={styles.link}>
-                        Students
-                      </MuiLink>
-                      <Box sx={{ width: "1px", height: "1rem", backgroundColor: theme.palette.divider }} />
-                      <MuiLink component={Link} to={`/deleteProject/${project.id}`} sx={styles.link}>
-                        Delete
-                      </MuiLink>
-                    </Box>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+        {/* Projects DataGrid */}
+        <Box sx={{ height: 400, width: "100%" }}>
+        <DataGrid
+          rows={filteredProjects}
+          columns={columns}
+          pagination // Pagination enabled
+          pageSizeOptions={[10, 25, 50]}
+          initialState={{
+            pagination: { paginationModel: { pageSize: 10, page: 0 } },
+          }}
+        />
+        </Box>
       </Box>
     </Box>
   );
