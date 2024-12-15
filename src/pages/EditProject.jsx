@@ -18,6 +18,9 @@ export default function EditProject() {
   // State for project data
   const [project, setProject] = useState(projectData || {});
 
+  // Validation
+  const [error, setError] = useState(false);
+
   // Handle project field edit
   const handleChange = (field, value) => {
     setProject((prevProject) => ({ ...prevProject, [field]: value }));
@@ -25,6 +28,11 @@ export default function EditProject() {
 
   // Save changes, go back to main page
   const handleSave = () => {
+    if (!project.name || !project.description || !project.defenseDate) {
+      setError(true);
+      return;
+    }
+
     navigate("/", { state: { updatedProject: project } });
   };
 
@@ -97,6 +105,8 @@ export default function EditProject() {
             onChange={(e) => handleChange("name", e.target.value)}
             variant="outlined"
             fullWidth
+            required
+            error={error && !project.name}
           />
           <TextField
             label="Description"
@@ -106,6 +116,8 @@ export default function EditProject() {
             multiline
             rows={4}
             fullWidth
+            required
+            error={error && !project.description}
           />
           <Box>
             <TextField
@@ -114,7 +126,8 @@ export default function EditProject() {
               value={project.defenseDate || ""}
               onChange={(e) => handleChange("defenseDate", e.target.value)}
               variant="outlined"
-              
+              required
+              error={error && !project.defenseDate}
             />
           </Box>
         </Box>
