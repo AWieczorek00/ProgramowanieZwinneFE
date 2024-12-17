@@ -79,7 +79,11 @@ export default function MainPage() {
             Students
           </Link>
           <Box sx={{ width: "1px", height: "1rem", backgroundColor: theme.palette.divider }} />
-          <Link to={`/deleteProject/${params.row.id}`} style={{ textDecoration: "none", color: theme.palette.primary.main }}>
+          <Link 
+            to={`/deleteProject/${params.row.id}`} 
+            state={{ projectData: params.row }} // Pass the selected row data to the delete page
+            style={{ textDecoration: "none", color: theme.palette.primary.main }}
+          >
             Delete
           </Link>
         </Box>

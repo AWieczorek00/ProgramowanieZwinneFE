@@ -75,10 +75,10 @@ export default function EditProject() {
       width: '6rem'
     },
     cancelButton: {
-      backgroundColor: theme.palette.error.main,
-      color: theme.palette.error.contrastText,
+      backgroundColor: theme.palette.grey[500],
+      color: theme.palette.common.white,
       "&:hover": {
-        backgroundColor: theme.palette.error.dark,
+        backgroundColor: theme.palette.grey[700],
       },
       width: '6rem'
     }
