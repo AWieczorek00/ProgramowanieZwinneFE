@@ -1,8 +1,26 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { Box, Button, TextField, Typography } from "@mui/material";
+import AuthService from "../services/AuthService";
+import UserService from "../services/UserService";
 
 export default function Login() {
+
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const navigate = useNavigate()
+
+  const login = (event) => {
+    event.preventDefault()
+    AuthService.login(email, password).then(() => {
+      UserService.getUser(email).then((response) => {
+        UserService.saveUserData(response.data)
+      }).then(() => {
+        navigate("/")
+      })
+    })
+  }
+
   return (
     <Box
       sx={{
@@ -28,13 +46,14 @@ export default function Login() {
         <Typography variant="h4" component="h1" gutterBottom align="center">
           Login
         </Typography>
-        <form style={{ width: "100%"}}>
+        <form style={{ width: "100%"}} onSubmit={(event) => login(event)}>
           <TextField
             fullWidth
-            label="Username"
-            name="username"
+            label="Email"
+            name="email"
             margin="normal"
             variant="outlined"
+            onChange={(event) => setEmail(event.target.value)}
           />
           <TextField
             fullWidth
@@ -43,6 +62,7 @@ export default function Login() {
             name="password"
             margin="normal"
             variant="outlined"
+            onChange={(event) => setPassword(event.target.value)}
           />
           <Button
             fullWidth

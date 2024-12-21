@@ -12,6 +12,9 @@ import Register from './pages/Register.jsx';
 import Navbar from './components/Navbar.jsx';
 import GlobalChat from './components/GlobalChat.jsx';
 import { Container } from '@mui/material';
+import GuardedRoute from './components/GuardedRoute.jsx';
+import { useEffect, useState } from 'react';
+import UserService from './services/UserService.js';
 
 function Layout() {
   const location = useLocation();
@@ -33,10 +36,11 @@ function Layout() {
 }
 
 function App() {
+
   const router = createBrowserRouter([
     {
       path: "/",
-      element: <Layout />,
+      element: <GuardedRoute Component={Layout}></GuardedRoute>,
       children: [
         {
           path: "/",

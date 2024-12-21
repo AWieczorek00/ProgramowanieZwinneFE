@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from 'react-router-dom';
 import { AppBar, Toolbar, Typography, Button, Box } from "@mui/material";
+import AuthService from "../services/AuthService";
 
 function Navbar() {
   return (
@@ -13,7 +14,7 @@ function Navbar() {
         </Typography>
 
         <Box>
-          <Button variant="contained" color="secondary" sx={{ ml: 2 }}>
+          <Button variant="contained" color="secondary" sx={{ ml: 2 }} onClick={() => AuthService.logout()}>
             Logout
           </Button>
         </Box>

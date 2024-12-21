@@ -1,8 +1,30 @@
-import React from "react";
-import { Link } from "react-router-dom";
-import { Box, Button, TextField, Typography } from "@mui/material";
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { Box, Button, Checkbox, FormControlLabel, FormGroup, TextField, Typography } from "@mui/material";
+import AuthService from "../services/AuthService";
+import UserService from "../services/UserService";
 
 export default function Register() {
+
+  const [stationary, setStationary] = useState(false)
+  const [name, setName] = useState("")
+  const [surname, setSurname] = useState("")
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [indexNumber, setIndexNumber] = useState("")
+  const navigate = useNavigate();
+
+  const handleChange = () => {
+    setStationary(!stationary)
+  }
+
+  const register = (event) => {
+    event.preventDefault()
+    AuthService.register(name, surname, email, password, indexNumber, stationary).catch((response) => {
+      navigate("/login")
+    })
+  }
+
   return (
     <Box
       sx={{
@@ -23,37 +45,57 @@ export default function Register() {
           boxShadow: 3,
           borderRadius: 2,
           bgcolor: "white",
-        }}
+        }} 
       >
         <Typography variant="h4" component="h1" gutterBottom align="center">
           Register
         </Typography>
-        <form style={{ width: "100%" }}>
+        <form style={{ width: "100%" }} onSubmit={(event) => register(event)}>
           <TextField
             fullWidth
-            required
-            label="Username"
-            name="username"
+            label="Name"
+            name="name"
+            value={name}
             margin="normal"
             variant="outlined"
+            onChange={(event) => setName(event.target.value)}
           />
           <TextField
             fullWidth
-            required
+            label="Surname"
+            name="surname"
+            margin="normal"
+            variant="outlined"
+            onChange={(event) => setSurname(event.target.value)}
+          />
+          <TextField
+            fullWidth
             label="Email"
             name="email"
             margin="normal"
             variant="outlined"
+            onChange={(event) => setEmail(event.target.value)}
           />
           <TextField
             fullWidth
-            required
             label="Password"
             type="password"
             name="password"
             margin="normal"
             variant="outlined"
+            onChange={(event) => setPassword(event.target.value)}
           />
+          <TextField
+            fullWidth
+            label="Index Number"
+            name="indexNumber"
+            margin="normal"
+            variant="outlined"
+            onChange={(event) => setIndexNumber(event.target.value)}
+          />
+          <FormGroup>
+            <FormControlLabel control={<Checkbox name="stationary" onChange={handleChange}></Checkbox>} label='Stationary'></FormControlLabel>
+          </FormGroup>
           <Button
             fullWidth
             type="submit"

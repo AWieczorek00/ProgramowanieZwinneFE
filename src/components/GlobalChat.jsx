@@ -4,11 +4,13 @@ import ChatIcon from '@mui/icons-material/Chat';
 import SockJS from 'sockjs-client';
 import { Client } from '@stomp/stompjs';
 import GlobalChatService from '../services/GlobalChatService';
+import UserService from '../services/UserService';
 
 const Chat = () => {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
-  const [username, setUsername] = useState('1');
+  const [userId, setUserId] = useState(UserService.getUserData().id);
+  const [username, setUsername] = useState(UserService.getUserData().email);
   const [open, setOpen] = useState(false);
   const messagesEndRef = useRef(null);
   const clientRef = useRef(null);
@@ -32,7 +34,6 @@ const Chat = () => {
       webSocketFactory: () => socket,
       onConnect: () => {
         client.subscribe('/topic/global', (message) => {
-            console.log(message)
           const receivedMessage = JSON.parse(message.body);
           setMessages((prevMessages) => [...prevMessages, receivedMessage]);
         });
@@ -49,8 +50,8 @@ const Chat = () => {
   }, []);
 
   const handleSend = () => {
-    if (input.trim() && username.trim()) {
-      const message = { userId: username, message: input };
+    if (input.trim()) {
+      const message = { userId: userId, username: username, message: input };
       clientRef.current.publish({ destination: '/app/globalChat', body: JSON.stringify(message) });
       setInput('');
     }
@@ -76,9 +77,9 @@ const Chat = () => {
         <Box sx={{ width: 500, bgcolor: 'background.paper', boxShadow: 3, borderRadius: 1, padding: 2 }}>
           <Box sx={{ maxHeight: 400, overflowY: 'auto', marginBottom: 2 }}>
             <List>
-              {messages.map((message, index) => (
+              {messages?.map((message, index) => (
                 <ListItem key={index}>
-                  <ListItemText primary={`${message.userId}: ${message.message}`} />
+                  <ListItemText primary={`${message.username}: ${message.message}`} />
                 </ListItem>
               ))}
               <div ref={messagesEndRef} />
