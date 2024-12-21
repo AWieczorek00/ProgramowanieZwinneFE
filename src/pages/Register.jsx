@@ -20,7 +20,7 @@ export default function Register() {
 
   const register = (event) => {
     event.preventDefault()
-    AuthService.register(name, surname, email, password, indexNumber, stationary).catch((response) => {
+    AuthService.register(name, surname, email, password, indexNumber, stationary).then((response) => {
       navigate("/login")
     })
   }
