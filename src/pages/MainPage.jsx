@@ -57,8 +57,8 @@ export default function MainPage() {
     { field: "creationDate", headerName: "Creation Date", width: 150 },
     { field: "defenseDate", headerName: "Defense Date", width: 150 },
     {
-      field: "settings",
-      headerName: "Settings",
+      field: "actions",
+      headerName: "Actions",
       width: 300,
       flex: 1,
       renderCell: (params) => (
