@@ -6,15 +6,15 @@ import AddProject from './pages/AddProject.jsx';
 import EditProject from './pages/EditProject.jsx';
 import DeleteProject from './pages/DeleteProject.jsx';
 import Tasks from './pages/Tasks.jsx';
+import AddTask from './pages/AddTask.jsx';
 import Students from './pages/Students.jsx';
+import AddStudent from './pages/AddStudent.jsx';
 import Login from './pages/Login.jsx';
 import Register from './pages/Register.jsx';
 import Navbar from './components/Navbar.jsx';
 import GlobalChat from './components/GlobalChat.jsx';
 import { Container } from '@mui/material';
 import GuardedRoute from './components/GuardedRoute.jsx';
-import { useEffect, useState } from 'react';
-import UserService from './services/UserService.js';
 
 function Layout() {
   const location = useLocation();
@@ -63,9 +63,17 @@ function App() {
           element: <Tasks />
         },
         {
+          path: "/project/:projectId/tasks/add",
+          element: <AddTask /> 
+        },
+        {
           path: "/students/:projectId",
           element: <Students />
         },
+        {
+          path: "/students/:projectId/add",
+          element: <AddStudent />
+        }
       ]
     },
     {

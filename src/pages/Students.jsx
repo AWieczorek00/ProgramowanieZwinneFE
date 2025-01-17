@@ -1,43 +1,61 @@
 import React, { useEffect, useState } from "react";
-import { Box, Button, Typography, useTheme, TextField, InputAdornment } from "@mui/material";
+import { Box, Button, Typography, useTheme, TextField } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
-import { Link, useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const Students = () => {
   const theme = useTheme();
-  const navigate = useNavigate();
+  const navigate = useNavigate(); 
   const { projectId } = useParams();
 
-  // Sample data for students table
-  const [students, setStudents] = useState([
-    { id: 1, name: "Name1", surname: "LastName1", email: "name1@example.com", index: "123456", stationary: true },
-    { id: 2, name: "Name2", surname: "LastName2", email: "name2@example.com", index: "654321", stationary: false },
-    { id: 3, name: "Name3", surname: "LastName3", email: "name3@example.com", index: "789012", stationary: true },
-    { id: 4, name: "Name4", surname: "LastName4", email: "name4@example.com", index: "345678", stationary: false },
-    { id: 5, name: "Name5", surname: "LastName5", email: "name5@example.com", index: "456789", stationary: false },
-    { id: 6, name: "Name6", surname: "LastName6", email: "name6@example.com", index: "908576", stationary: true },
-    { id: 7, name: "Name7", surname: "LastName7", email: "name7@example.com", index: "345678", stationary: true },
-  ]);
-
-  const [filteredStudents, setFilteredStudents] = useState(students);
+  const [students, setStudents] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  // Handling search query change
+  // Fetch students from the backend
+  const fetchStudents = async (searchText = "") => {
+    setLoading(true);
+    try {
+      const response = await axios.get("/api/students", {
+        params: {
+          projectId,
+          search: searchText,
+        },
+      });
+      setStudents(response.data);
+    } catch (error) {
+      console.error("Error fetching students:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Handle student deletion
+  const handleDeleteStudent = async (userId) => {
+    if (!window.confirm("Are you sure you want to remove this student?")) return;
+
+    try {
+      await axios.delete(`/api/project/${projectId}/user/${userId}`);
+      setStudents((prevStudents) =>
+        prevStudents.filter((student) => student.id !== userId)
+      );
+      alert("Student removed successfully");
+    } catch (error) {
+      console.error("Error removing student:", error);
+      alert("Failed to remove student");
+    }
+  };
+
+  // Handle search query change
   const handleSearchChange = (event) => {
     setSearchQuery(event.target.value);
   };
 
-  // Filter students based on search query
+  // Fetch students when searchQuery changes
   useEffect(() => {
-    const filtered = students.filter(
-      (student) =>
-        student.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        student.surname.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        student.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        student.index.includes(searchQuery)
-    );
-    setFilteredStudents(filtered);
-  }, [searchQuery, students]);
+    fetchStudents(searchQuery);
+  }, [searchQuery]);
 
   // DataGrid columns
   const columns = [
@@ -69,15 +87,13 @@ const Students = () => {
       headerName: "Actions",
       width: 150,
       renderCell: (params) => (
-        <Box sx={{ display: "flex", gap: theme.spacing(1), alignItems: "center" }}>
-          <Link
-            onClick={() => alert("Delete student")}
-            state={{ projectData: params.row }}
-            style={{ textDecoration: "none", color: theme.palette.primary.main }}
-          >
-            Delete
-          </Link>
-        </Box>
+        <Button
+          variant="text"
+          color="error"
+          onClick={() => handleDeleteStudent(params.row.id)}
+        >
+          Remove
+        </Button>
       ),
     },
   ];
@@ -98,7 +114,14 @@ const Students = () => {
           Students in Project: {projectId}
         </Typography>
 
-        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: theme.spacing(2) }}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: theme.spacing(2),
+          }}
+        >
           <Button
             variant="contained"
             sx={{
@@ -106,7 +129,7 @@ const Students = () => {
               color: theme.palette.primary.contrastText,
               "&:hover": { backgroundColor: theme.palette.primary.dark },
             }}
-            onClick={() => alert("Add student")}
+            onClick={() => navigate(`/students/${projectId}/add`)}
           >
             Add new student
           </Button>
@@ -122,8 +145,9 @@ const Students = () => {
 
         <Box sx={{ height: 400, width: "100%" }}>
           <DataGrid
-            rows={filteredStudents}
+            rows={students}
             columns={columns}
+            loading={loading}
             pagination
             pageSizeOptions={[10, 25, 50]}
             initialState={{

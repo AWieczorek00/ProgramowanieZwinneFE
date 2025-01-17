@@ -1,43 +1,59 @@
 import React, { useEffect, useState } from "react";
-import { Box, Button, Typography, useTheme, TextField, InputAdornment } from "@mui/material";
+import { Box, Button, Typography, useTheme, TextField } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
-import { Link, useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const Tasks = () => {
   const theme = useTheme();
+  const navigate = useNavigate();  // For navigation
   const { projectId } = useParams();
 
-  // Sample data for tasks table
-  const [tasks, setTasks] = useState([
-    { id: 1, name: "Task 1 name", order: 1, description: "Task 1 Description", estimatedTime: "2h" },
-    { id: 2, name: "Task 2 name", order: 2, description: "Task 2 Description", estimatedTime: "3h" },
-    { id: 3, name: "Task 3 name", order: 3, description: "Task 3 Description", estimatedTime: "1.5h" },
-    { id: 4, name: "Task 4 name", order: 4, description: "Task 4 Description", estimatedTime: "4h" },
-    { id: 5, name: "Task 5 name", order: 5, description: "Task 5 Description", estimatedTime: "1h" },
-    { id: 6, name: "Task 6 name", order: 6, description: "Task 6 Description", estimatedTime: "2h" },
-    { id: 7, name: "Task 7 name", order: 7, description: "Task 7 Description", estimatedTime: "1.5h" },
-    { id: 8, name: "Task 8 name", order: 8, description: "Task 8 Description", estimatedTime: "3h" },
-    { id: 9, name: "Task 9 name", order: 9, description: "Task 9 Description", estimatedTime: "1h" },
-    { id: 10, name: "Task 10 name", order: 10, description: "Task 10 Description", estimatedTime: "1.5h" }
-  ]);
-
-  const [filteredTasks, setFilteredTasks] = useState(tasks);
+  const [tasks, setTasks] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  // Fetch tasks from the backend
+  const fetchTasks = async (searchText = "") => {
+    setLoading(true);
+    try {
+      const response = await axios.get("/api/tasks", {
+        params: {
+          projectId,
+          search: searchText,
+        },
+      });
+      setTasks(response.data);
+    } catch (error) {
+      console.error("Error fetching tasks:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Handle task deletion
+  const handleDeleteTask = async (taskId) => {
+    if (!window.confirm("Are you sure you want to delete this task?")) return;
+
+    try {
+      await axios.delete(`/api/project/${projectId}/task/${taskId}`);
+      setTasks((prevTasks) => prevTasks.filter((task) => task.id !== taskId));
+      alert("Task deleted successfully");
+    } catch (error) {
+      console.error("Error deleting task:", error);
+      alert("Failed to delete task");
+    }
+  };
 
   // Handle search query change
   const handleSearchChange = (event) => {
     setSearchQuery(event.target.value);
   };
 
-  // Filter tasks based on search query
+  // Fetch tasks when the search query changes
   useEffect(() => {
-    const filtered = tasks.filter(
-      (task) =>
-        task.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        task.estimatedTime.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-    setFilteredTasks(filtered);
-  }, [searchQuery, tasks]);
+    fetchTasks(searchQuery);
+  }, [searchQuery]);
 
   // DataGrid columns
   const columns = [
@@ -51,18 +67,21 @@ const Tasks = () => {
       headerName: "Actions",
       width: 150,
       renderCell: (params) => (
-        <Box sx={{ display: "flex", gap: theme.spacing(1), alignItems: "center" }}>
-          <Link
-            onClick={() => alert("Delete task")}
-            state={{ projectData: params.row }}
-            style={{ textDecoration: "none", color: theme.palette.primary.main }}
-          >
-            Delete
-          </Link>
-        </Box>
+        <Button
+          variant="text"
+          color="error"
+          onClick={() => handleDeleteTask(params.row.id)}
+        >
+          Delete
+        </Button>
       ),
     },
   ];
+
+  // Navigate to AddTask page
+  const handleAddTask = () => {
+    navigate(`/project/${projectId}/tasks/add`);
+  };
 
   return (
     <Box
@@ -80,7 +99,14 @@ const Tasks = () => {
           Tasks in Project: {projectId}
         </Typography>
 
-        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: theme.spacing(2) }}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: theme.spacing(2),
+          }}
+        >
           <Button
             variant="contained"
             sx={{
@@ -88,7 +114,7 @@ const Tasks = () => {
               color: theme.palette.primary.contrastText,
               "&:hover": { backgroundColor: theme.palette.primary.dark },
             }}
-            onClick={() => alert("Add new task")}
+            onClick={handleAddTask}  // Navigate to AddTask page
           >
             Add new task
           </Button>
@@ -104,8 +130,9 @@ const Tasks = () => {
 
         <Box sx={{ height: 400, width: "100%" }}>
           <DataGrid
-            rows={filteredTasks}
+            rows={tasks}
             columns={columns}
+            loading={loading}
             pagination
             pageSizeOptions={[10, 25, 50]}
             initialState={{

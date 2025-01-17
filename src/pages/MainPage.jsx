@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Box, Typography, Button, TextField, useTheme } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { Link, useLocation } from "react-router-dom";
+import axios from 'axios';
 
 export default function MainPage() {
   const theme = useTheme();
@@ -40,6 +41,11 @@ export default function MainPage() {
     setSearchQuery(event.target.value);
   };
 
+  // Call fetchProjects on search query change
+  useEffect(() => {
+    fetchProjects(searchQuery);
+  }, [searchQuery]); 
+
   // Filtering projects based on search query
   const filteredProjects = projects.filter((project) => {
     const query = searchQuery.toLowerCase();
@@ -47,6 +53,18 @@ export default function MainPage() {
       value.toString().toLowerCase().includes(query)
     );
   });
+
+  // Fetch projects based on search query
+  const fetchProjects = async (searchQuery) => {
+    try {
+      const response = await axios.get('/api/project/search', {
+        params: { searchText: searchQuery }
+      });
+      setProjects(response.data);
+    } catch (error) {
+      console.error('Error fetching projects:', error);
+    }
+  };
 
   // DataGrid columns
   const columns = [
