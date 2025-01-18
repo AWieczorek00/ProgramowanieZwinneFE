@@ -1,20 +1,18 @@
 import React, { useState } from "react";
-import { Box, Typography, Button, TextField, useTheme } from "@mui/material";
+import { Box, Typography, Button, TextField, useTheme, InputLabel } from "@mui/material";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
-import ProjectService from "../services/ProjectService";
+import FileService from "../services/FileService";
 
-export default function AddTask() {
+export default function AddFile() {
   const theme = useTheme();
   const navigate = useNavigate();
   const { projectId } = useParams(); 
 
-  // State for the new task
-  const [task, setTask] = useState({
-    name: "",
-    description: "",
-    order: 1,
-    estimatedTime: "",
+
+  // State for the new file
+  const [file, setFile] = useState({
+    data: ""
   });
 
   // Validation state
@@ -22,27 +20,31 @@ export default function AddTask() {
 
   // Handle input changes
   const handleChange = (field, value) => {
-    setTask((prevTask) => ({ ...prevTask, [field]: value }));
+    setFile((prevFile) => ({ ...prevFile, [field]: value }));
   };
 
-  // Handle adding a new task
+  // Handle adding a new file
   const handleAdd = () => {
-    if (!task.name || !task.description || !task.estimatedTime) {
+    if (!file.data) {
       setError(true);
       return;
     }
-    ProjectService.addTaskToProject(projectId, task.name, task.description, task.estimatedTime).then((response) => {
-      alert("Task added successfully");
-      navigate(`/tasks/${projectId}`);
+    const formData = new FormData();
+
+    formData.append("file", file.data)
+
+    FileService.addFileToProject(projectId, formData).then((response) => {
+      alert("File added successfully");
+      navigate(`/files/${projectId}`);
     }).catch((err) => {
-      console.error("Error adding task:", err);
-      alert("Failed to add task");
+      console.error("Error adding file:", err);
+      alert("Failed to add file");
     })
   };
 
-  // Cancel, go back to tasks page
+  // Cancel, go back to files page
   const handleCancel = () => {
-    navigate(`/tasks/${projectId}`);
+    navigate(`/files/${projectId}`);
   };
 
   const styles = {
@@ -92,40 +94,18 @@ export default function AddTask() {
     <Box sx={styles.container}>
       <Box sx={styles.innerBox}>
         <Typography variant="h5" sx={{ mb: 3, textAlign: "center" }}>
-          Add New Task
+          Add New File
         </Typography>
 
         <Box sx={styles.inputContainer}>
-          <TextField
-            label="Task Name"
-            value={task.name}
-            onChange={(e) => handleChange("name", e.target.value)}
-            variant="outlined"
-            fullWidth
-            required
-            error={error && !task.name}
-          />
-          <TextField
-            label="Description"
-            value={task.description}
-            onChange={(e) => handleChange("description", e.target.value)}
-            variant="outlined"
-            multiline
-            rows={4}
-            fullWidth
-            required
-            error={error && !task.description}
-          />
-          <TextField
-            label="Estimated Time (hours)"
-            value={task.estimatedTime}
-            onChange={(e) => handleChange("estimatedTime", e.target.value)}
-            variant="outlined"
-            type="number"
-            fullWidth
-            required
-            error={error && !task.estimatedTime}
-          />
+        <Button
+            variant="contained"
+            component="label">
+            Upload file
+            <input type={'file'} hidden onChange={(e) => handleChange("data", e.target.files[0])}></input>
+        </Button>
+        <InputLabel>File name {file.data.name}</InputLabel>
+        <br></br>
         </Box>
 
         <Box sx={styles.buttonContainer}>

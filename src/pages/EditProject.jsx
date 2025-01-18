@@ -7,6 +7,7 @@ import {
   useTheme,
 } from "@mui/material";
 import { useNavigate, useLocation } from "react-router-dom";
+import ProjectService from "../services/ProjectService";
 
 export default function EditProject() {
   const theme = useTheme();
@@ -28,12 +29,15 @@ export default function EditProject() {
 
   // Save changes, go back to main page
   const handleSave = () => {
-    if (!project.name || !project.description || !project.defenseDate) {
+    if (!project.name || !project.description || !project.dateDefense) {
       setError(true);
       return;
     }
-
-    navigate("/", { state: { updatedProject: project } });
+    ProjectService.updateProject(project).then((response) => {
+      navigate("/", { state: { addedProject: project } });
+    }).catch((err) => {
+      console.log(err)
+    })
   };
 
   // Cancel, go back to main page
@@ -122,12 +126,17 @@ export default function EditProject() {
           <Box>
             <TextField
               label="Defense Date"
-              type="date"
-              value={project.defenseDate || ""}
-              onChange={(e) => handleChange("defenseDate", e.target.value)}
+              type="datetime-local"
+              value={project.dateDefense.slice(0, 16) || ""}
+              onChange={(e) => handleChange("dateDefense", e.target.value)}
               variant="outlined"
               required
-              error={error && !project.defenseDate}
+              error={error && !project.dateDefense}
+              InputProps={{
+                inputProps:{
+                  min: project.dateCreate.slice(0,16)
+                }
+              }}
             />
           </Box>
         </Box>

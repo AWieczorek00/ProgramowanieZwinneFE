@@ -22,6 +22,8 @@ export default function Register() {
     event.preventDefault()
     AuthService.register(name, surname, email, password, indexNumber, stationary).then((response) => {
       navigate("/login")
+    }).catch((err) => {
+      console.log(err)
     })
   }
 

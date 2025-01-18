@@ -1,6 +1,7 @@
 import React from "react";
 import { Box, Typography, Button, TextField, useTheme } from "@mui/material";
 import { useNavigate, useLocation } from "react-router-dom";
+import ProjectService from "../services/ProjectService";
 
 export default function DeleteProject(){
     const theme = useTheme();
@@ -12,7 +13,11 @@ export default function DeleteProject(){
 
     // Delete project, go back to main page
     const handleDelete = () => {
+      ProjectService.deleteProject(projectData.id).then(() => {
         navigate("/", { state: { deletedProjectId: projectData.id } });
+      }).catch((err) => {
+        console.log(err)
+      })
     };
 
     // Cancel, go back to main page
@@ -105,7 +110,7 @@ export default function DeleteProject(){
           <Box sx={styles.dateContainer}>
             <TextField
                 label="Creation Date"
-                value={projectData.creationDate}
+                value={projectData.dateCreate.slice(0,16)}
                 variant="outlined"
                 InputProps={{ readOnly: true, disabled: true }}
                 fullWidth
@@ -113,7 +118,7 @@ export default function DeleteProject(){
             />
             <TextField
                 label="Defense Date"
-                value={projectData.defenseDate}
+                value={projectData.dateDefense.slice(0,16)}
                 variant="outlined"
                 InputProps={{ readOnly: true, disabled: true }}
                 fullWidth

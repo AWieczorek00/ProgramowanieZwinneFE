@@ -15,6 +15,8 @@ import Navbar from './components/Navbar.jsx';
 import GlobalChat from './components/GlobalChat.jsx';
 import { Container } from '@mui/material';
 import GuardedRoute from './components/GuardedRoute.jsx';
+import Files from './pages/Files.jsx';
+import AddFile from './pages/AddFile.jsx';
 
 function Layout() {
   const location = useLocation();
@@ -73,7 +75,15 @@ function App() {
         {
           path: "/students/:projectId/add",
           element: <AddStudent />
-        }
+        },
+        {
+          path: "/files/:projectId",
+          element: <Files />
+        },
+        {
+          path: "/project/:projectId/files/add",
+          element: <AddFile /> 
+        },
       ]
     },
     {

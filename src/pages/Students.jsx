@@ -3,6 +3,8 @@ import { Box, Button, Typography, useTheme, TextField } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
+import UserService from "../services/UserService";
+import ProjectService from "../services/ProjectService";
 
 const Students = () => {
   const theme = useTheme();
@@ -14,37 +16,32 @@ const Students = () => {
   const [loading, setLoading] = useState(false);
 
   // Fetch students from the backend
-  const fetchStudents = async (searchText = "") => {
+  const fetchStudents = () => {
     setLoading(true);
-    try {
-      const response = await axios.get("/api/students", {
-        params: {
-          projectId,
-          search: searchText,
-        },
-      });
+
+    ProjectService.getUsersFromProject(projectId).then((response) => {
+      console.log(response)
       setStudents(response.data);
-    } catch (error) {
-      console.error("Error fetching students:", error);
-    } finally {
-      setLoading(false);
-    }
+    }).catch((err) => {
+      console.error("Error fetching students:", err);
+    }).finally(() => {
+      setLoading(false)
+    })
   };
 
   // Handle student deletion
-  const handleDeleteStudent = async (userId) => {
+  const handleDeleteStudent = (userId) => {
     if (!window.confirm("Are you sure you want to remove this student?")) return;
 
-    try {
-      await axios.delete(`/api/project/${projectId}/user/${userId}`);
+    ProjectService.removeUserFromProject(projectId, userId).then((response) => {
       setStudents((prevStudents) =>
         prevStudents.filter((student) => student.id !== userId)
       );
       alert("Student removed successfully");
-    } catch (error) {
-      console.error("Error removing student:", error);
+    }).catch((err) => {
+      console.error("Error removing student:", err);
       alert("Failed to remove student");
-    }
+    })
   };
 
   // Handle search query change

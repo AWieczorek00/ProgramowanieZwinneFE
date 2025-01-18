@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { Box, Typography, Button, Select, MenuItem, InputLabel, FormControl, useTheme } from "@mui/material";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
+import UserService from "../services/UserService";
+import ProjectService from "../services/ProjectService";
 
 export default function AddStudent() {
   const theme = useTheme();
@@ -14,36 +16,35 @@ export default function AddStudent() {
   const [error, setError] = useState(false);
 
   // Fetch all students
-  const fetchStudents = async () => {
+  const fetchStudents = (searchText = "") => {
     setLoading(true);
-    try {
-      const response = await axios.get("/api/students");
+    UserService.getUsers(searchText).then((response) => {
+      console.log(response)
       setStudents(response.data);
-    } catch (error) {
-      console.error("Error fetching students:", error);
-    } finally {
-      setLoading(false);
-    }
+    }).catch((err) => {
+      console.error("Error fetching students:", err);
+    }).finally(() => {
+      setLoading(false)
+    })
   };
 
   useEffect(() => {
     fetchStudents();
   }, []);
 
-  const handleAddStudent = async () => {
+  const handleAddStudent = () => {
     if (!selectedStudent) {
       setError(true);
       return;
     }
-
-    try {
-      await axios.post(`/api/project/${projectId}/user/${selectedStudent}`);
+    
+    ProjectService.addUserToProject(projectId, selectedStudent).then((response) => {
       alert("Student added successfully");
       navigate(`/students/${projectId}`); // Redirect to the Students page after adding the student
-    } catch (error) {
+    }).catch((err) => {
       console.error("Error adding student:", error);
       alert("Failed to add student");
-    }
+    })
   };
 
   const handleCancel = () => {

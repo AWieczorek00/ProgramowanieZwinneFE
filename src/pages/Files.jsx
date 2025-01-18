@@ -1,42 +1,40 @@
 import React, { useEffect, useState } from "react";
-import { Box, Button, Typography, useTheme, TextField } from "@mui/material";
+import { Box, Button, Typography, useTheme, TextField, Link } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { useParams, useNavigate } from "react-router-dom";
-import axios from "axios";
-import TaskService from "../services/TaskService";
-import ProjectService from "../services/ProjectService";
+import FileService from "../services/FileService";
 
-const Tasks = () => {
+const Files = () => {
   const theme = useTheme();
   const navigate = useNavigate();  // For navigation
   const { projectId } = useParams();
 
-  const [tasks, setTasks] = useState([]);
+  const [files, setFiles] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // Fetch tasks from the backend
-  const fetchTasks = (searchText = "") => {
+  // Fetch files from the backend
+  const fetchFiles = (searchText = "") => {
     setLoading(true);
-    TaskService.searchTask(searchText, projectId).then((response) => {
-      setTasks(response.data);
+    FileService.getAllFilesFromProject(projectId).then((response) => {
+      setFiles(response.data);
     }).catch((err) => {
-        console.error("Error fetching tasks:", err);
+        console.error("Error fetching files:", err);
     }).finally(() => {
       setLoading(false)
     })
   };
 
-  // Handle task deletion
-  const handleDeleteTask = (taskId) => {
-    if (!window.confirm("Are you sure you want to delete this task?")) return;
+  // Handle files deletion
+  const handleDeleteFiles = (filename) => {
+    if (!window.confirm("Are you sure you want to delete this file?")) return;
 
-    ProjectService.removeTaskFromProject(projectId, taskId).then(() => {
-      setTasks((prevTasks) => prevTasks.filter((task) => task.id !== taskId));
-      alert("Task deleted successfully");
+    FileService.removeFileFromProject(projectId, filename).then(() => {
+      setFiles((prevFiles) => prevFiles.filter((file) => file.filename !== filename));
+      alert("File deleted successfully");
     }).catch((err) => {
-      console.error("Error deleting task:", err);
-      alert("Failed to delete task");
+        setFiles((prevFiles) => prevFiles.filter((file) => file.filename !== filename));
+        alert("File deleted successfully");
     })
   };
 
@@ -45,18 +43,28 @@ const Tasks = () => {
     setSearchQuery(event.target.value);
   };
 
-  // Fetch tasks when the search query changes
+  // Fetch files when the search query changes
   useEffect(() => {
-    fetchTasks(searchQuery);
+    fetchFiles(searchQuery);
   }, [searchQuery]);
 
   // DataGrid columns
   const columns = [
     { field: "id", headerName: "ID", width: 70 },
-    { field: "name", headerName: "Name", width: 250 },
-    { field: "order", headerName: "Order", width: 100 },
-    { field: "description", headerName: "Description", width: 350 },
-    { field: "estimatedTime", headerName: "Estimated Time", width: 150 },
+    { field: "filename", headerName: "File Name", width: 250 },
+    { 
+        field: "url", 
+        headerName: "URL", 
+        width: 100,
+        renderCell: (params) => (
+            <Button
+            variant="text"
+            color="error"
+            onClick={() => window.open(params.row.url, '_blank', 'noopener,noreferrer')}
+          >
+            Pobierz plik
+          </Button>)
+    },
     {
       field: "actions",
       headerName: "Actions",
@@ -65,17 +73,20 @@ const Tasks = () => {
         <Button
           variant="text"
           color="error"
-          onClick={() => handleDeleteTask(params.row.id)}
+          onClick={() => {
+            handleDeleteFiles(params.row.filename)
+          }}
         >
           Delete
         </Button>
       ),
     },
+    
   ];
 
-  // Navigate to AddTask page
-  const handleAddTask = () => {
-    navigate(`/project/${projectId}/tasks/add`);
+  // Navigate to AddFile page
+  const handleAddFiles = () => {
+    navigate(`/project/${projectId}/files/add`);
   };
 
   return (
@@ -91,7 +102,7 @@ const Tasks = () => {
     >
       <Box sx={{ maxWidth: "75%", width: "100%", marginTop: "4rem" }}>
         <Typography variant="h5" sx={{ mb: 3, textAlign: "center" }}>
-          Tasks in Project: {projectId}
+          Files in Project: {projectId}
         </Typography>
 
         <Box
@@ -109,13 +120,13 @@ const Tasks = () => {
               color: theme.palette.primary.contrastText,
               "&:hover": { backgroundColor: theme.palette.primary.dark },
             }}
-            onClick={handleAddTask}  // Navigate to AddTask page
+            onClick={handleAddFiles}  // Navigate to AddFile page
           >
-            Add new task
+            Add new file
           </Button>
           <TextField
             variant="outlined"
-            placeholder="Search tasks..."
+            placeholder="Search files..."
             value={searchQuery}
             onChange={handleSearchChange}
             size="small"
@@ -125,7 +136,7 @@ const Tasks = () => {
 
         <Box sx={{ height: 400, width: "100%" }}>
           <DataGrid
-            rows={tasks}
+            rows={files}
             columns={columns}
             loading={loading}
             pagination
@@ -140,4 +151,4 @@ const Tasks = () => {
   );
 };
 
-export default Tasks;
+export default Files;

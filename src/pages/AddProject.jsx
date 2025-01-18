@@ -7,6 +7,7 @@ import {
   useTheme,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import ProjectService from "../services/ProjectService";
 
 export default function AddProject() {
   const theme = useTheme();
@@ -14,11 +15,10 @@ export default function AddProject() {
 
   // State for new project fields, generate ID and dates
   const [project, setProject] = useState({
-    id: Math.floor(Math.random() * 10000),
-    creationDate: new Date().toISOString().split("T")[0],
+    dateCreate: new Date().toISOString().slice(0, 16),
     name: "",
     description: "",
-    defenseDate: new Date().toISOString().split("T")[0],
+    dateDefense: new Date().toISOString().slice(0, 16),
   });
 
   // Validation state
@@ -31,12 +31,15 @@ export default function AddProject() {
 
   // Handle adding a new project
   const handleAdd = () => {
-    if (!project.name || !project.description || !project.defenseDate) {
+    if (!project.name || !project.description || !project.dateDefense) {
       setError(true);
       return;
     }
-
-    navigate("/", { state: { addedProject: project } });
+    ProjectService.addProject(project).then((response) => {
+      navigate("/", { state: { addedProject: project } });
+    }).catch((err) => {
+      console.log(err)
+    })
   };
 
   // Cancel, go back to main page
@@ -100,13 +103,6 @@ export default function AddProject() {
 
         <Box sx={styles.inputContainer}>
           <TextField
-            label="ID"
-            value={project.id}
-            InputProps={{ readOnly: true, disabled: true }} // ID field not clickable
-            variant="outlined"
-            fullWidth
-          />
-          <TextField
             label="Project Name"
             value={project.name}
             onChange={(e) => handleChange("name", e.target.value)}
@@ -129,21 +125,26 @@ export default function AddProject() {
           <Box sx={styles.dateContainer}>
             <TextField
               label="Creation Date"
-              type="date"
-              value={project.creationDate}
+              type="datetime-local"
+              value={project.dateCreate}
               InputProps={{ readOnly: true, disabled: true }} // Creation Date field not clickable
               variant="outlined"
               fullWidth
             />
             <TextField
               label="Defense Date"
-              type="date"
-              value={project.defenseDate}
-              onChange={(e) => handleChange("defenseDate", e.target.value)}
+              type="datetime-local"
+              value={project.dateDefense}
+              onChange={(e) => handleChange("dateDefense", e.target.value)}
               variant="outlined"
               fullWidth
               required
-              error={error && !project.defenseDate}
+              error={error && !project.dateDefense}
+              InputProps={{
+                inputProps:{
+                  min: project.dateCreate
+                }
+              }}
             />
           </Box>
         </Box>

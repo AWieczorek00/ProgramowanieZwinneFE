@@ -3,6 +3,7 @@ import { Box, Typography, Button, TextField, useTheme } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { Link, useLocation } from "react-router-dom";
 import axios from 'axios';
+import ProjectService from "../services/ProjectService";
 
 export default function MainPage() {
   const theme = useTheme();
@@ -11,16 +12,7 @@ export default function MainPage() {
   const [searchQuery, setSearchQuery] = useState("");
 
   // Sample data for projects table
-  const [projects, setProjects] = useState([
-    { no: 1, id: 10, name: "Example project 1", description: "Lorem ipsum...", creationDate: "2024-11-15", defenseDate: "2025-01-22" },
-    { no: 2, id: 20, name: "Example project 2", description: "Description 2", creationDate: "2024-11-16", defenseDate: "2025-01-21" },
-    { no: 3, id: 30, name: "Example project 3", description: "Description 3", creationDate: "2024-11-17", defenseDate: "2025-02-10" },
-    { no: 4, id: 40, name: "Example project 4", description: "Description 4", creationDate: "2024-11-18", defenseDate: "2025-01-23" },
-    { no: 5, id: 50, name: "Example project 5", description: "Description 5", creationDate: "2024-10-19", defenseDate: "2025-01-15" },
-    { no: 6, id: 60, name: "Example project 6", description: "Description 6", creationDate: "2024-11-20", defenseDate: "2025-02-25" },
-    { no: 7, id: 70, name: "Example project 7", description: "Description 7", creationDate: "2024-12-20", defenseDate: "2025-01-25" },
-    { no: 8, id: 80, name: "Example project 8", description: "Description 8", creationDate: "2024-11-28", defenseDate: "2025-01-28" },
-  ]);
+  const [projects, setProjects] = useState([]);
 
   // Check for updated project data
   useEffect(() => {
@@ -46,21 +38,12 @@ export default function MainPage() {
     fetchProjects(searchQuery);
   }, [searchQuery]); 
 
-  // Filtering projects based on search query
-  const filteredProjects = projects.filter((project) => {
-    const query = searchQuery.toLowerCase();
-    return Object.values(project).some((value) =>
-      value.toString().toLowerCase().includes(query)
-    );
-  });
-
   // Fetch projects based on search query
-  const fetchProjects = async (searchQuery) => {
+  const fetchProjects = (searchQuery) => {
     try {
-      const response = await axios.get('/api/project/search', {
-        params: { searchText: searchQuery }
-      });
-      setProjects(response.data);
+      ProjectService.searchProjects(searchQuery).then((response) => {
+        setProjects(response.data)
+      })
     } catch (error) {
       console.error('Error fetching projects:', error);
     }
@@ -68,12 +51,11 @@ export default function MainPage() {
 
   // DataGrid columns
   const columns = [
-    { field: "no", headerName: "No", width: 70 },
     { field: "id", headerName: "ID", width: 100 },
     { field: "name", headerName: "Project Name", width: 200 },
     { field: "description", headerName: "Description", width: 200, flex: 1 },
-    { field: "creationDate", headerName: "Creation Date", width: 150 },
-    { field: "defenseDate", headerName: "Defense Date", width: 150 },
+    { field: "dateCreate", headerName: "Creation Date", width: 150 },
+    { field: "dateDefense", headerName: "Defense Date", width: 150 },
     {
       field: "actions",
       headerName: "Actions",
@@ -91,6 +73,10 @@ export default function MainPage() {
           <Box sx={{ width: "1px", height: "1rem", backgroundColor: theme.palette.divider }} />
           <Link to={`/tasks/${params.row.id}`} style={{ textDecoration: "none", color: theme.palette.primary.main }}>
             Tasks
+          </Link>
+          <Box sx={{ width: "1px", height: "1rem", backgroundColor: theme.palette.divider }} />
+          <Link to={`/files/${params.row.id}`} style={{ textDecoration: "none", color: theme.palette.primary.main }}>
+            Files
           </Link>
           <Box sx={{ width: "1px", height: "1rem", backgroundColor: theme.palette.divider }} />
           <Link to={`/students/${params.row.id}`} style={{ textDecoration: "none", color: theme.palette.primary.main }}>
@@ -132,7 +118,7 @@ export default function MainPage() {
 
         <Box sx={{ height: 400, width: "100%" }}>
           <DataGrid
-            rows={filteredProjects}
+            rows={projects}
             columns={columns}
             pagination
             pageSizeOptions={[10, 25, 50]}
