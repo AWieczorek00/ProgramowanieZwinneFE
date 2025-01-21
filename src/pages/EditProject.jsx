@@ -33,10 +33,17 @@ export default function EditProject() {
       setError(true);
       return;
     }
+
+    project.name = project.name.trim()
+    project.description = project.description.trim()
+
     ProjectService.updateProject(project).then((response) => {
       navigate("/", { state: { addedProject: project } });
-    }).catch((err) => {
-      console.log(err)
+    }).catch((error) => {
+      const errors = error.response.data.errors
+      for (const key of Object.keys(errors)){
+          alert(key + ": "+ errors[key])
+      }
     })
   };
 

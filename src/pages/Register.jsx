@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Box, Button, Checkbox, FormControlLabel, FormGroup, TextField, Typography } from "@mui/material";
 import AuthService from "../services/AuthService";
 import UserService from "../services/UserService";
+import { type } from "@testing-library/user-event/dist/type";
 
 export default function Register() {
 
@@ -20,10 +21,13 @@ export default function Register() {
 
   const register = (event) => {
     event.preventDefault()
-    AuthService.register(name, surname, email, password, indexNumber, stationary).then((response) => {
+    AuthService.register(name, surname, email, password, indexNumber, stationary).then(() => {
       navigate("/login")
-    }).catch((err) => {
-      console.log(err)
+    }).catch((error) => {
+      const errors = error.response.data.errors
+      for (const key of Object.keys(errors)){
+        alert(key + ": "+ errors[key])
+      }
     })
   }
 
@@ -60,7 +64,7 @@ export default function Register() {
             value={name}
             margin="normal"
             variant="outlined"
-            onChange={(event) => setName(event.target.value)}
+            onChange={(event) => setName(event.target.value.trim())}
           />
           <TextField
             fullWidth
@@ -68,7 +72,7 @@ export default function Register() {
             name="surname"
             margin="normal"
             variant="outlined"
-            onChange={(event) => setSurname(event.target.value)}
+            onChange={(event) => setSurname(event.target.value.trim())}
           />
           <TextField
             fullWidth
@@ -76,7 +80,7 @@ export default function Register() {
             name="email"
             margin="normal"
             variant="outlined"
-            onChange={(event) => setEmail(event.target.value)}
+            onChange={(event) => setEmail(event.target.value.trim())}
           />
           <TextField
             fullWidth
@@ -85,7 +89,7 @@ export default function Register() {
             name="password"
             margin="normal"
             variant="outlined"
-            onChange={(event) => setPassword(event.target.value)}
+            onChange={(event) => setPassword(event.target.value.trim())}
           />
           <TextField
             fullWidth
@@ -93,7 +97,7 @@ export default function Register() {
             name="indexNumber"
             margin="normal"
             variant="outlined"
-            onChange={(event) => setIndexNumber(event.target.value)}
+            onChange={(event) => setIndexNumber(event.target.value.trim())}
           />
           <FormGroup>
             <FormControlLabel control={<Checkbox name="stationary" onChange={handleChange}></Checkbox>} label='Stationary'></FormControlLabel>

@@ -1,19 +1,25 @@
 import instance from "./AxiosService";
 
-const addFileToProject = (projectID, formData) => {
-    return instance.post("/api/minio/project/"+projectID, formData, {
+const addFileToProject = async (projectID, formData) => {
+    return await instance.post("/api/minio/project/"+projectID, formData, {
         headers: {
             "Content-Type": "multipart/form-data"
         }
+    }).catch((error) => {
+        return Promise.reject(error)
     });
 }
 
-const removeFileFromProject = (projectID, filename) => {
-    return instance.delete("/api/minio/project/"+projectID+"/file", {params: {'filename': filename}});
+const removeFileFromProject = async (projectID, filename) => {
+    return await instance.delete("/api/minio/project/"+projectID+"/file", {params: {'filename': filename}}).catch((error) => {
+        return Promise.reject(error)
+    });
 }
 
-const getAllFilesFromProject = (projectID) => {
-    return instance.get("/api/minio/project/"+projectID+"/file");
+const getAllFilesFromProject = async (projectID) => {
+    return await instance.get("/api/minio/project/"+projectID+"/file").catch((error) => {
+        return Promise.reject(error)
+    });
 }
 
 const FileService = {

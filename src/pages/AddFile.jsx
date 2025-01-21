@@ -29,16 +29,15 @@ export default function AddFile() {
       setError(true);
       return;
     }
-    const formData = new FormData();
 
+    const formData = new FormData();
     formData.append("file", file.data)
 
     FileService.addFileToProject(projectId, formData).then((response) => {
       alert("File added successfully");
       navigate(`/files/${projectId}`);
-    }).catch((err) => {
-      console.error("Error adding file:", err);
-      alert("Failed to add file");
+    }).catch((error) => {
+      alert(error.response.data.description)
     })
   };
 
@@ -104,7 +103,7 @@ export default function AddFile() {
             Upload file
             <input type={'file'} hidden onChange={(e) => handleChange("data", e.target.files[0])}></input>
         </Button>
-        <InputLabel>File name {file.data.name}</InputLabel>
+        <InputLabel>File name {file.data?.name}</InputLabel>
         <br></br>
         </Box>
 

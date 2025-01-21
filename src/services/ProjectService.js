@@ -1,46 +1,64 @@
 import instance from "./AxiosService";
 
 
-const addProject = (project) => {
-    return instance.post("/api/project/", project)
+const addProject = async (project) => {
+    return await instance.post("/api/project/", project).catch((error) => {
+        return Promise.reject(error)
+    });
 }
 
-const searchProjects = (searchQuery) => {
-    return instance.get("/api/project/search", {params: {
+const searchProjects = async (searchQuery) => {
+    return await instance.get("/api/project/search", {params: {
         searchText: searchQuery
-    }})
+    }}).catch((error) => {
+        return Promise.reject(error)
+    });
 }
 
-const updateProject = (project) => {
-    return instance.patch("/api/project/"+project.id, project)
+const updateProject = async (project) => {
+    return await instance.patch("/api/project/"+project.id, project).catch((error) => {
+        return Promise.reject(error)
+    });
 }
 
-const deleteProject = (id) => {
-    return instance.delete("/api/project/"+id)
+const deleteProject = async (id) => {
+    return await instance.delete("/api/project/"+id).catch((error) => {
+        return Promise.reject(error)
+    });
 }
 
-const addTaskToProject = (projectID, taskName, taskDescription, taskEstimatedTime) => {
-    return instance.post("/api/project/"+projectID+'/task', null, {params: {
+const addTaskToProject = async (projectID, taskName, taskDescription, taskEstimatedTime) => {
+    return await instance.post("/api/project/"+projectID+'/task',{
         'taskName': taskName,
         'taskDescription': taskDescription,
         'taskEstimatedTime': taskEstimatedTime
-    }})
+    }).catch((error) => {
+        return Promise.reject(error)
+    });
 }
 
-const removeTaskFromProject = (projectID, taskID) => {
-    return instance.delete("/api/project/"+projectID+"/task/"+taskID)
+const removeTaskFromProject = async (projectID, taskID) => {
+    return await instance.delete("/api/project/"+projectID+"/task/"+taskID).catch((error) => {
+        return Promise.reject(error)
+    });
 }
 
-const addUserToProject = (projectID, userID) => {
-    return instance.post("/api/project/"+ projectID + "/user/" + userID);
+const addUserToProject = async (projectID, userID) => {
+    return await instance.post("/api/project/"+ projectID + "/user/" + userID).catch((error) => {
+        return Promise.reject(error)
+    });
 }
 
-const removeUserFromProject = (projectID, userID) => {
-    return instance.delete("/api/project/"+ projectID + "/user/" + userID);
+const removeUserFromProject = async (projectID, userID) => {
+    return await instance.delete("/api/project/"+ projectID + "/user/" + userID).catch((error) => {
+        return Promise.reject(error)
+    });
 }
 
-const getUsersFromProject = (projectID) => {
-    return instance.get("/api/project/"+projectID+"/user")
+const getUsersFromProject = async (projectID) => {
+    return await instance.get("/api/project/"+projectID+"/user").catch((error) => {
+        return Promise.reject(error)
+    });
 }
 
 const ProjectService = {

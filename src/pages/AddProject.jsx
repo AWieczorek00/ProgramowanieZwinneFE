@@ -35,10 +35,18 @@ export default function AddProject() {
       setError(true);
       return;
     }
-    ProjectService.addProject(project).then((response) => {
+
+    for (const key of Object.keys(project)){
+      project[key] = project[key].trim()
+    }
+    
+    ProjectService.addProject(project).then(() => {
       navigate("/", { state: { addedProject: project } });
-    }).catch((err) => {
-      console.log(err)
+    }).catch((error) => {
+      const errors = error.response.data.errors
+      for (const key of Object.keys(errors)){
+          alert(key + ": "+ errors[key])
+      }
     })
   };
 

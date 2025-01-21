@@ -1,5 +1,6 @@
 import axios from "axios";
 import TokenService from "./TokenService";
+import AuthService from "./AuthService";
 
 const instance = axios.create({
     baseURL: "http://localhost:8080", //tu potem można dać env variable
@@ -25,28 +26,28 @@ instance.interceptors.response.use(
     (res) => {
       return res;
     },
-    // async (err) => {
-    //   const originalConfig = err.config;
-    //   if (originalConfig.url !== "/auth/signin" && err.response) {
-    //     if (err.response.status === 401 && !originalConfig._retry) {
-    //       originalConfig._retry = true;
-    //       try {
-    //         let refreshToken = TokenService.getLocalRefreshToken()
-    //         const rs = await instance.post("/auth/refreshtoken", {
-    //           refreshToken: refreshToken,
-    //         });
-    //         const { accessToken } = rs.data;
-    //         TokenService.updateLocalAccessToken(accessToken);
-    //         return instance(originalConfig);
-    //       } catch (_error) {
-    //         AuthService.logout();
-    //         store.dispatch({type: userActions.removeData()})
-    //         window.location.href = "/Login";
-    //         return Promise.reject(_error);
-    //       }
-    //     }
-    //   }
-    //   return Promise.reject(err);
-    // }
+    async (err) => {
+        if (err.config.url !== "/auth/signin" && err.response){
+            if (err.response.status === 403 && !err.config._retry){
+                err.config._retry = true;
+                alert(err.response.data.description)
+                AuthService.logout()
+                window.location.href = "/login";
+                return Promise.reject(err);
+            }
+        }
+
+        if (err.message.includes('Network Error') || err.code === 'ERR_CONNECTION_RESET'){
+            return Promise.reject({
+                'response':{
+                    'data': {
+                        'description': "Network Error"
+                        }
+                    }
+                })
+        }
+
+        return Promise.reject(err)
+    }
   );
   export default instance;

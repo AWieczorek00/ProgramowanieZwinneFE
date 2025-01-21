@@ -19,7 +19,6 @@ export default function AddStudent() {
   const fetchStudents = (searchText = "") => {
     setLoading(true);
     UserService.getUsers(searchText).then((response) => {
-      console.log(response)
       setStudents(response.data);
     }).catch((err) => {
       console.error("Error fetching students:", err);
@@ -41,9 +40,8 @@ export default function AddStudent() {
     ProjectService.addUserToProject(projectId, selectedStudent).then((response) => {
       alert("Student added successfully");
       navigate(`/students/${projectId}`); // Redirect to the Students page after adding the student
-    }).catch((err) => {
-      console.error("Error adding student:", error);
-      alert("Failed to add student");
+    }).catch((error) => {
+      alert(error.response.data.description)
     })
   };
 
@@ -136,7 +134,7 @@ export default function AddStudent() {
             >
               {students.map((student) => (
                 <MenuItem key={student.id} value={student.id}>
-                  {student.name} {student.surname}
+                  {student.name} {student.surname} {student.email}
                 </MenuItem>
               ))}
             </Select>

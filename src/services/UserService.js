@@ -1,7 +1,9 @@
 import instance from "./AxiosService";
 
 const getUser = async (email) => {
-    return await instance.get("/api/user/" + email);
+    return await instance.get("/api/user/" + email).catch((error) => {
+        return Promise.reject(error)
+    });
 }
 
 const saveUserData = (data) => {
@@ -16,10 +18,12 @@ const removeUserData =() => {
     localStorage.clear("user_data")
 }
 
-const getUsers = (searchText) => {
-    return instance.get("/api/user/search",  {params: {
+const getUsers = async (searchText) => {
+    return await instance.get("/api/user/search",  {params: {
         searchText: searchText
-    }})
+    }}).catch((error) => {
+        return Promise.reject(error)
+    });
 }
 
 
