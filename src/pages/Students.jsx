@@ -20,10 +20,9 @@ const Students = () => {
     setLoading(true);
 
     ProjectService.getUsersFromProject(projectId).then((response) => {
-      console.log(response)
       setStudents(response.data);
-    }).catch((err) => {
-      console.error("Error fetching students:", err);
+    }).catch((error) => {
+      alert(error.response.data.description)
     }).finally(() => {
       setLoading(false)
     })
@@ -38,9 +37,8 @@ const Students = () => {
         prevStudents.filter((student) => student.id !== userId)
       );
       alert("Student removed successfully");
-    }).catch((err) => {
-      console.error("Error removing student:", err);
-      alert("Failed to remove student");
+    }).catch((error) => {
+      alert(error.response.data.description)
     })
   };
 
@@ -60,7 +58,7 @@ const Students = () => {
     { field: "name", headerName: "Name", width: 150 },
     { field: "surname", headerName: "Surname", width: 150 },
     { field: "email", headerName: "Email", width: 250 },
-    { field: "index", headerName: "Index Number", width: 150 },
+    { field: "indexNumber", headerName: "Index Number", width: 150 },
     {
       field: "stationary",
       headerName: "Stationary",

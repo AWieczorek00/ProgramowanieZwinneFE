@@ -10,11 +10,13 @@ const register = async (name, surname, email, password, indexNumber, stationary)
         'password':password,
         'indexNumber':indexNumber,
         'stationary':stationary,
-        'role': "STUDENT"
+    }).catch((error) => {
+        return Promise.reject(error)
     })
 };
 
 const login = async (email, password) => {
+    
     return await instance
         .post("/auth/login", {
             'email': email,
@@ -25,8 +27,8 @@ const login = async (email, password) => {
                 TokenService.setUser(response.data);
             }
             return response.data
-        }).catch(error => {
-            console.log(error)
+        }).catch((error) => {
+            return Promise.reject(error)
         });
 };
 

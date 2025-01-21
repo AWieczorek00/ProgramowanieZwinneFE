@@ -20,8 +20,8 @@ const Tasks = () => {
     setLoading(true);
     TaskService.searchTask(searchText, projectId).then((response) => {
       setTasks(response.data);
-    }).catch((err) => {
-        console.error("Error fetching tasks:", err);
+    }).catch((error) => {
+      alert(error.response.data.description)
     }).finally(() => {
       setLoading(false)
     })
@@ -34,9 +34,8 @@ const Tasks = () => {
     ProjectService.removeTaskFromProject(projectId, taskId).then(() => {
       setTasks((prevTasks) => prevTasks.filter((task) => task.id !== taskId));
       alert("Task deleted successfully");
-    }).catch((err) => {
-      console.error("Error deleting task:", err);
-      alert("Failed to delete task");
+    }).catch((error) => {
+      alert(error.response.data.description)
     })
   };
 

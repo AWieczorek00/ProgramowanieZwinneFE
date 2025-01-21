@@ -1,12 +1,11 @@
 import instance from './AxiosService';
 
-const getAllGlobalChatMessages  = () => {
-    return instance.get("/api/globalChat/").then(response => {
+const getAllGlobalChatMessages  = async () => {
+    return await instance.get("/api/globalChat/").then(response => {
         return response.data
-    }).catch(error => {
-        console.log(error)
-        return []
-    })
+    }).catch((error) => {
+        return Promise.reject(error)
+    });
 }
 
 const GlobalChatService = {

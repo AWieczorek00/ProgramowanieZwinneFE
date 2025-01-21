@@ -17,9 +17,9 @@ export default function Login() {
         UserService.saveUserData(response.data)
       }).then(() => {
         navigate("/")
-      }).catch((err) => {
-        console.log(err)
       })
+    }).catch((error) => {
+      alert(error.response.data.description)
     })
   }
 

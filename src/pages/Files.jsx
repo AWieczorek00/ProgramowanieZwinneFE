@@ -18,8 +18,8 @@ const Files = () => {
     setLoading(true);
     FileService.getAllFilesFromProject(projectId).then((response) => {
       setFiles(response.data);
-    }).catch((err) => {
-        console.error("Error fetching files:", err);
+    }).catch((error) => {
+      alert(error.response.data.description)
     }).finally(() => {
       setLoading(false)
     })
@@ -32,9 +32,8 @@ const Files = () => {
     FileService.removeFileFromProject(projectId, filename).then(() => {
       setFiles((prevFiles) => prevFiles.filter((file) => file.filename !== filename));
       alert("File deleted successfully");
-    }).catch((err) => {
-        setFiles((prevFiles) => prevFiles.filter((file) => file.filename !== filename));
-        alert("File deleted successfully");
+    }).catch((error) => {
+      alert(error.response.data.description)
     })
   };
 

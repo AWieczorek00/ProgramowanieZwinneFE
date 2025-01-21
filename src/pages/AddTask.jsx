@@ -31,12 +31,14 @@ export default function AddTask() {
       setError(true);
       return;
     }
-    ProjectService.addTaskToProject(projectId, task.name, task.description, task.estimatedTime).then((response) => {
+    ProjectService.addTaskToProject(projectId, task.name.trim(), task.description.trim(), task.estimatedTime.trim()).then((response) => {
       alert("Task added successfully");
       navigate(`/tasks/${projectId}`);
-    }).catch((err) => {
-      console.error("Error adding task:", err);
-      alert("Failed to add task");
+    }).catch((error) => {
+      const errors = error.response.data.errors
+      for (const key of Object.keys(errors)){
+          alert(key + ": "+ errors[key])
+      }
     })
   };
 

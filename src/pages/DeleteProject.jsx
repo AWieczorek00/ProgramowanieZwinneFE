@@ -15,8 +15,8 @@ export default function DeleteProject(){
     const handleDelete = () => {
       ProjectService.deleteProject(projectData.id).then(() => {
         navigate("/", { state: { deletedProjectId: projectData.id } });
-      }).catch((err) => {
-        console.log(err)
+      }).catch((error) => {
+        alert(error.response.data.description)
       })
     };
 

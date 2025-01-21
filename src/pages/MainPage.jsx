@@ -45,7 +45,7 @@ export default function MainPage() {
         setProjects(response.data)
       })
     } catch (error) {
-      console.error('Error fetching projects:', error);
+        alert(error.response.data.description)
     }
   };
 
