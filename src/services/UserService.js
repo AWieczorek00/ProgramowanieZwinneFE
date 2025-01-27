@@ -26,6 +26,20 @@ const getUsers = async (searchText) => {
     });
 }
 
+const getAllRoles = async () => {
+    return await instance.get("/api/role/")
+        .catch((error) => {
+            return Promise.reject(error); // Obsługa błędów
+        });
+};
+
+const changeRole = async (id, role) => {
+    return await instance.post(`/api/user/changeRole/${id}/${role}`)
+        .catch((error) => {
+            return Promise.reject(error); // Error handling
+        });
+};
+
 
 const UserService ={
     getUser,
@@ -33,6 +47,8 @@ const UserService ={
     getUserData,
     removeUserData,
     getUsers,
+    getAllRoles,
+    changeRole
 }
 
 export default UserService
