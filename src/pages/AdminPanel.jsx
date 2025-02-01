@@ -141,13 +141,6 @@ export default function AdminPanel() {
                     alignItems: "center",
                     marginBottom: theme.spacing(2)
                 }}>
-                    <Button variant="contained" sx={{
-                        backgroundColor: theme.palette.primary.main,
-                        color: theme.palette.primary.contrastText,
-                        "&:hover": { backgroundColor: theme.palette.primary.dark }
-                    }} component={Link} to="/addStudent">
-                        Add Student
-                    </Button>
                     <TextField
                         variant="outlined"
                         placeholder="Search students..."

@@ -40,9 +40,13 @@ export default function EditProject() {
     ProjectService.updateProject(project).then((response) => {
       navigate("/", { state: { addedProject: project } });
     }).catch((error) => {
-      const errors = error.response.data.errors
-      for (const key of Object.keys(errors)){
+      if(error.response.data.errors !== undefined){
+        const errors = error.response.data.errors
+        for (const key of Object.keys(errors)){
           alert(key + ": "+ errors[key])
+        }
+      }else{
+          alert(error.response.data.description)
       }
     })
   };
