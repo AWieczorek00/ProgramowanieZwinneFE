@@ -132,7 +132,7 @@ export default function AdminPanel() {
         }}>
             <Box sx={{ maxWidth: "75%", width: "100%", marginTop: "4rem" }}>
                 <Typography variant="h5" sx={{ mb: 3, textAlign: "center" }}>
-                    Students Table
+                    Users Table
                 </Typography>
 
                 <Box sx={{
@@ -143,7 +143,7 @@ export default function AdminPanel() {
                 }}>
                     <TextField
                         variant="outlined"
-                        placeholder="Search students..."
+                        placeholder="Search users..."
                         value={searchQuery}
                         onChange={handleSearchChange}
                         size="small"
@@ -168,7 +168,7 @@ export default function AdminPanel() {
                 <DialogTitle>Edit Role</DialogTitle>
                 <DialogContent>
                     <DialogContentText>
-                        Select a new role for the student.
+                        Select a new role for the user.
                     </DialogContentText>
                     <Select
                         value={selectedStudent?.role || ""}
